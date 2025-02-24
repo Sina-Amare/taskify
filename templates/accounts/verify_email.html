@@ -1,0 +1,12 @@
+{% extends 'accounts/base.html' %} {% block title %}تأیید ایمیل{% endblock %} {% block header %}کد تأیید ایمیل{% endblock %} {% block content %}
+<p>یک کد ۶ رقمی به ایمیل شما ارسال شد. لطفاً آن را وارد کنید.</p>
+
+<form method="post">
+    {% csrf_token %}
+    <input type="text" name="code" placeholder="کد تأیید را وارد کنید" required>
+    <button type="submit">تأیید</button>
+</form>
+
+{% if error %}
+<p style="color: red;">{{ error }}</p>
+{% endif %} {% endblock %}
