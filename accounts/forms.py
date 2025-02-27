@@ -33,3 +33,9 @@ class LoginForm(AuthenticationForm):
     username = forms.CharField(
         label="ایمیل یا نام کاربری", widget=forms.TextInput(attrs={"autofocus": True})
     )
+
+
+class ProfileUpdateForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = ['username', 'email', 'first_name', 'last_name']

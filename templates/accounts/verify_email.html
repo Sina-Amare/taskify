@@ -15,6 +15,11 @@
     <button type="submit" class="btn btn-success w-100">✅ تأیید</button>
 </form>
 
+<!-- دکمه ارسال مجدد کد با تایمر -->
+<p class="mt-3 text-center">
+    <button id="resend-btn" class="btn btn-secondary" disabled>🔄 ارسال مجدد کد (60)</button>
+</p>
+
 <style>
     input {
         border-radius: 5px;
@@ -23,13 +28,53 @@
     }
     
     button {
-        background: linear-gradient(45deg, #28a745, #218838);
         font-weight: bold;
         transition: 0.3s;
     }
     
-    button:hover {
+    .btn-success {
+        background: linear-gradient(45deg, #28a745, #218838);
+    }
+    
+    .btn-success:hover {
         background: linear-gradient(45deg, #218838, #1e7e34);
     }
+    
+    .btn-secondary {
+        background: #6c757d;
+        border: none;
+    }
+    
+    .btn-secondary:disabled {
+        background: #b1b1b1;
+        cursor: not-allowed;
+    }
 </style>
+
+<!-- جاوااسکریپت برای تایمر -->
+<script>
+    let countdown = 60;
+    let resendBtn = document.getElementById("resend-btn");
+
+    function updateTimer() {
+        resendBtn.textContent = `🔄 ارسال مجدد کد (${countdown})`;
+        countdown--;
+        if (countdown < 0) {
+            resendBtn.textContent = "🔄 ارسال مجدد کد";
+            resendBtn.removeAttribute("disabled");
+        } else {
+            setTimeout(updateTimer, 1000);
+        }
+    }
+
+    setTimeout(updateTimer, 1000);
+
+    resendBtn.addEventListener("click", function() {
+        resendBtn.setAttribute("disabled", "true");
+        countdown = 60;
+        updateTimer();
+        window.location.href = "{% url 'resend_verification' %}"; // ارسال درخواست مجدد
+    });
+</script>
+
 {% endblock %}
