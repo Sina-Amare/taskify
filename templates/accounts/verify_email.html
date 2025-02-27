@@ -1,12 +1,35 @@
 {% extends 'accounts/base.html' %} {% block title %}تأیید ایمیل{% endblock %} {% block header %}کد تأیید ایمیل{% endblock %} {% block content %}
-<p>یک کد ۶ رقمی به ایمیل شما ارسال شد. لطفاً آن را وارد کنید.</p>
-
-<form method="post">
-    {% csrf_token %}
-    <input type="text" name="code" placeholder="کد تأیید را وارد کنید" required>
-    <button type="submit">تأیید</button>
-</form>
+<p class="text-muted">یک کد ۶ رقمی به ایمیل شما ارسال شد. لطفاً آن را وارد کنید.</p>
 
 {% if error %}
-<p style="color: red;">{{ error }}</p>
-{% endif %} {% endblock %}
+<div class="alert alert-danger">
+    {{ error }}
+</div>
+{% endif %}
+
+<form method="post" class="mt-3">
+    {% csrf_token %}
+    <div class="mb-3">
+        <input type="text" name="code" class="form-control text-center" placeholder="کد تأیید را وارد کنید" required>
+    </div>
+    <button type="submit" class="btn btn-success w-100">✅ تأیید</button>
+</form>
+
+<style>
+    input {
+        border-radius: 5px;
+        text-align: center;
+        font-size: 18px;
+    }
+    
+    button {
+        background: linear-gradient(45deg, #28a745, #218838);
+        font-weight: bold;
+        transition: 0.3s;
+    }
+    
+    button:hover {
+        background: linear-gradient(45deg, #218838, #1e7e34);
+    }
+</style>
+{% endblock %}
