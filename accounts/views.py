@@ -105,11 +105,16 @@ def login_view(request):
 
 @login_required
 def dashboard_view(request):
+    """Handles profile update including phone number validation."""
     if request.method == 'POST':
         form = ProfileUpdateForm(request.POST, instance=request.user)
         if form.is_valid():
             form.save()
+            messages.success(request, "Profile updated successfully.")
             return redirect('dashboard')
+        else:
+            messages.error(request, "Please correct the errors below.")
     else:
         form = ProfileUpdateForm(instance=request.user)
+
     return render(request, 'accounts/dashboard.html', {'form': form})

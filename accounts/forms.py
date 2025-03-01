@@ -14,14 +14,16 @@ class RegisterForm(UserCreationForm):
         username = self.cleaned_data['username']
         if len(username) < 6:
             raise forms.ValidationError(
-                "نام کاربری باید حداقل ۶ کاراکتر باشد.")
+                "Username must be at least 6 characters long.")
         return username
 
     def clean_password1(self):
+        """Ensures the password contains at least one uppercase letter and one special character."""
         password = self.cleaned_data.get('password1')
         if not re.search(r'[A-Z]', password) or not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
             raise forms.ValidationError(
-                "رمز عبور باید حداقل یک حرف بزرگ (A-Z) داشته باشد. ,ر خاص(!@  # $%^&*...) داشته باشد.")
+                "Password must contain at least one uppercase letter (A-Z) and one special character (!@#$%^&*...)."
+            )
         return password
 
     class Meta:
@@ -31,11 +33,36 @@ class RegisterForm(UserCreationForm):
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(
-        label="ایمیل یا نام کاربری", widget=forms.TextInput(attrs={"autofocus": True})
+        label="Username or Email:", widget=forms.TextInput(attrs={"autofocus": True})
     )
 
 
 class ProfileUpdateForm(forms.ModelForm):
+    """Form to update user profile including phone number validation."""
+    phone_number = forms.CharField(required=False)
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get("phone_number", "").strip()
+
+        # بررسی فرمت شماره ایران
+        if phone_number and not re.match(r'^(\+98|0)9\d{9}$', phone_number):
+            raise forms.ValidationError(
+                "Phone number must be a valid Iranian number (e.g., +989123456789 or 09123456789)."
+            )
+
+        # تبدیل شماره به فرمت استاندارد (+98XXXXXXXXXX)
+        if phone_number.startswith("0"):
+            phone_number = "+98" + phone_number[1:]
+
+        # بررسی اینکه شماره از قبل در دیتابیس نباشد (به جز برای کاربر فعلی)
+        existing_user = CustomUser.objects.filter(
+            phone_number=phone_number).exclude(pk=self.instance.pk).first()
+        if existing_user:
+            raise forms.ValidationError(
+                "This phone number is already in use by another user.")
+
+        return phone_number
+
     class Meta:
         model = CustomUser
-        fields = ['username', 'email', 'first_name', 'last_name']
+        fields = ['username', 'email', 'phone_number']
